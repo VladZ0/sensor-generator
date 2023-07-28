@@ -6,6 +6,8 @@ Start app using Make commands, all are descripted below.
 If you want to test app and start it in docker, just use: make test ---> make build ---> make up.
 But dont forget to add your configs (.env.postgres, .env.redis, config.yml)
 
+Redis TTL you can change in ./pkg/client/redis/redis.go.
+
 make swagger --->
     This command will create swagger docs if you change it.
 
