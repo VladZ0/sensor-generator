@@ -104,15 +104,15 @@ func NewApp(ctx context.Context, cfg *config.Config, logger *logging.Logger) (Ap
 			}); err != nil {
 			return App{}, err
 		}
+	}
 
-		if err := utils.GenerateData(utils.Services{
-			SensorService:      sensorService,
-			SensorGroupService: sensorGroupService,
-			SpieceService:      spieceService,
-			SensorDataService:  sensorDataService,
-		}); err != nil {
-			return App{}, err
-		}
+	if err := utils.GenerateData(utils.Services{
+		SensorService:      sensorService,
+		SensorGroupService: sensorGroupService,
+		SpieceService:      spieceService,
+		SensorDataService:  sensorDataService,
+	}); err != nil {
+		return App{}, err
 	}
 
 	return App{
