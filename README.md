@@ -3,8 +3,8 @@ Anyway you can change app configs and .env as you want.
 
 Start app using Make commands, all are descripted below.
 
-If you want to test app and start it in docker, just use: make test ---> make build ---> make up
-But dont forget to add your configs is (.env.postgres, .env.redis, config.yml)
+If you want to test app and start it in docker, just use: make test ---> make build ---> make up.
+But dont forget to add your configs (.env.postgres, .env.redis, config.yml)
 
 make swagger --->
     This command will create swagger docs if you change it.
