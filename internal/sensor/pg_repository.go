@@ -34,7 +34,7 @@ func (r *repository) FindAll(ctx context.Context, filters SensorFilters) ([]Sens
 	defer rows.Close()
 	if err != nil {
 		r.logger.Errorf("Failed to get rows, due to error: %v", err)
-		return nil, apperror.ErrInternalSystem
+		return nil, apperror.ErrorWithMessage(apperror.ErrBadRequest, "Sensors not found.")
 	}
 
 	sensors := make([]Sensor, 0)
@@ -144,17 +144,39 @@ func (r *repository) FindAvgTemperatureForSensor(ctx context.Context, filters Se
 		argsCounter += 2
 	}
 
-	if !filters.FromDate.IsZero() && !filters.TillDate.IsZero() {
+	if !filters.FromDate.IsZero() {
 		if argsCounter == 1 {
 			q += "\n" + ` WHERE`
 		} else {
 			q += ` AND`
 		}
-		q += fmt.Sprintf(` sd.created_at BETWEEN $%d AND $%d`, argsCounter, argsCounter+1)
+		q += fmt.Sprintf(` sd.created_at >= $%d`, argsCounter)
 		args = append(args, filters.FromDate)
-		args = append(args, filters.TillDate)
-		argsCounter += 2
+		argsCounter++
 	}
+
+	if !filters.TillDate.IsZero() {
+		if argsCounter == 1 {
+			q += "\n" + ` WHERE`
+		} else {
+			q += ` AND`
+		}
+		q += fmt.Sprintf(` sd.created_at <= $%d`, argsCounter)
+		args = append(args, filters.TillDate)
+		argsCounter++
+	}
+
+	// if !filters.FromDate.IsZero() && !filters.TillDate.IsZero() {
+	// 	if argsCounter == 1 {
+	// 		q += "\n" + ` WHERE`
+	// 	} else {
+	// 		q += ` AND`
+	// 	}
+	// 	q += fmt.Sprintf(` sd.created_at BETWEEN $%d AND $%d`, argsCounter, argsCounter+1)
+	// 	args = append(args, filters.FromDate)
+	// 	args = append(args, filters.TillDate)
+	// 	argsCounter += 2
+	// }
 
 	var temperature float32
 

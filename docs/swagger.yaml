@@ -190,12 +190,12 @@ paths:
       summary: Min Temperature
       tags:
       - Sensors
-  /api/v1/sensor/{groupName}/temperature/average:
+  /api/v1/sensor/{codeName}/temperature/average:
     get:
       parameters:
       - description: Name of the group
         in: path
-        name: groupName
+        name: codeName
         required: true
         type: string
       - description: from

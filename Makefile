@@ -19,7 +19,8 @@ migrate:
 	psql -U $(POSTGRES_USER) -d $(POSTGRES_DB) --password $(POSTGRES_PASSWORD) -f ./migrations/1_init.up.sql
 
 start_redis:
-	docker run -d redis
+	docker run --name redis -d redis
 
 stop_redis:
 	docker stop redis
+	docker rm redis

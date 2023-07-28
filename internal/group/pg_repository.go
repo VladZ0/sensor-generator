@@ -61,12 +61,24 @@ func (r *repository) FindSpiecesInGroup(ctx context.Context, groupName string, f
 	args = append(args, groupName)
 	argsCounter++
 
-	if !filters.FromDate.IsZero() && !filters.TillDate.IsZero() {
-		q += fmt.Sprintf(` AND sd.created_at BETWEEN $%d AND $%d`, argsCounter, argsCounter+1)
+	if !filters.FromDate.IsZero() {
+		q += " AND" + fmt.Sprintf(` sd.created_at >= $%d`, argsCounter)
 		args = append(args, filters.FromDate)
-		args = append(args, filters.TillDate)
-		argsCounter += 2
+		argsCounter++
 	}
+
+	if !filters.TillDate.IsZero() {
+		q += " AND" + fmt.Sprintf(` sd.created_at <= $%d`, argsCounter)
+		args = append(args, filters.TillDate)
+		argsCounter++
+	}
+
+	// if !filters.FromDate.IsZero() && !filters.TillDate.IsZero() {
+	// 	q += fmt.Sprintf(` AND sd.created_at BETWEEN $%d AND $%d`, argsCounter, argsCounter+1)
+	// 	args = append(args, filters.FromDate)
+	// 	args = append(args, filters.TillDate)
+	// 	argsCounter += 2
+	// }
 
 	q += "\n" + `GROUP BY s.id, s.name, s.created_at, s.updated_at`
 
@@ -76,7 +88,7 @@ func (r *repository) FindSpiecesInGroup(ctx context.Context, groupName string, f
 	defer rows.Close()
 	if err != nil {
 		r.logger.Errorf("Cannot find spieces, due to error: %v", err)
-		return nil, apperror.ErrInternalSystem
+		return nil, apperror.ErrorWithMessage(apperror.ErrBadRequest, "Spieces not found.")
 	}
 
 	var count int
@@ -113,7 +125,7 @@ func (r *repository) FindAll(ctx context.Context, filters SensorGroupFilters) ([
 	rows, err := r.client.QueryContext(ctx, q)
 	if err != nil {
 		r.logger.Errorf("Failed to get rows, due to error: %v", err)
-		return nil, apperror.ErrInternalSystem
+		return nil, apperror.ErrorWithMessage(apperror.ErrBadRequest, "Sensor groups not found.")
 	}
 	defer rows.Close()
 
@@ -146,7 +158,7 @@ func (r *repository) FindAvgTransparencyInGroup(ctx context.Context, groupName s
 
 	if err := r.client.QueryRow(q, args...).Scan(&transparency); err != nil {
 		r.logger.Errorf("Cannot measure transparency, due to error: %v", err)
-		return 0, apperror.ErrInternalSystem
+		return 0, apperror.ErrorWithMessage(apperror.ErrBadRequest, "No data was found.")
 	}
 
 	r.logger.Info("Transparency were successfully measured.")
@@ -168,7 +180,7 @@ func (r *repository) FindAvgTemperatureInGroup(ctx context.Context, groupName st
 
 	if err := r.client.QueryRow(q, args...).Scan(&temperature); err != nil {
 		r.logger.Errorf("Cannot measure transparency, due to error: %v", err)
-		return 0.0, apperror.ErrInternalSystem
+		return 0.0, apperror.ErrorWithMessage(apperror.ErrBadRequest, "No data was found.")
 	}
 
 	return temperature, nil

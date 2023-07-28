@@ -56,7 +56,7 @@ func (r *repository) FindAll(ctx context.Context, filters SpieceFilters) ([]Spie
 	defer rows.Close()
 	if err != nil {
 		r.logger.Errorf("Cannot find spieces, due to error: %v", err)
-		return nil, apperror.ErrInternalSystem
+		return nil, apperror.ErrorWithMessage(apperror.ErrBadRequest, "Spieces not found.")
 	}
 
 	for rows.Next() {
@@ -79,7 +79,7 @@ func (r *repository) FindOneByID(ctx context.Context, id int, filters SpieceFilt
 	if err := r.client.QueryRow(q, id).Scan(&spiece.ID, &spiece.Name,
 		&spiece.CreatedAt, &spiece.UpdatedAt); err != nil {
 		r.logger.Errorf("Cannot scan spieces row.")
-		return nil, apperror.ErrInternalSystem
+		return nil, apperror.ErrorWithMessage(apperror.ErrBadRequest, "Spiece not found.")
 	}
 
 	return &spiece, nil

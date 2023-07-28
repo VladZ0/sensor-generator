@@ -301,7 +301,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/sensor/{groupName}/temperature/average": {
+        "/api/v1/sensor/{codeName}/temperature/average": {
             "get": {
                 "tags": [
                     "Sensors"
@@ -311,7 +311,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Name of the group",
-                        "name": "groupName",
+                        "name": "codeName",
                         "in": "path",
                         "required": true
                     },

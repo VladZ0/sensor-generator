@@ -23,6 +23,7 @@ make down --->
 
 make migrate --->
     If you want to use postgres locally (not in container), use this command to create tables.
+    It uses default host and port.
     But don't forget to create your database and set configs.
 
 make start_redis --->

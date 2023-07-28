@@ -1,6 +1,7 @@
 package sensor
 
 import (
+	"regexp"
 	"sensors-generator/internal/apperror"
 	"sensors-generator/internal/spiece"
 	"sensors-generator/pkg/logging"
@@ -68,6 +69,19 @@ func NewCoordsFromString(x, y, z string) (Coordinates, error) {
 
 func NewCodenameFromString(codename string) (Codename, error) {
 	splitted := strings.Split(codename, " ")
+
+	pattern := `^[a-zA-Z]+\s\d+$`
+
+	matched, err := regexp.MatchString(pattern, codename)
+	if err != nil {
+		logging.GetLogger().Errorf("Error while regex matching: %v", err)
+		return Codename{}, apperror.ErrInternalSystem
+	}
+
+	if !matched {
+		logging.GetLogger().Errorf("Regex not matched: %v", err)
+		return Codename{}, apperror.ErrorWithMessage(apperror.ErrBadRequest, "Wrong codename.")
+	}
 
 	gName := splitted[0]
 	index, err := strconv.Atoi(splitted[1])
