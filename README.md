@@ -6,27 +6,27 @@ Start app using Make commands, all are descripted below.
 If you want to test app and start it in docker, just use: make test ---> make build ---> make up
 But dont forget to add your configs is (.env.postgres, .env.redis, config.yml)
 
-make swagger
+make swagger --->
     This command will create swagger docs if you change it.
 
-make test
+make test --->
     Test app.
 
-make build:
+make build --->
     Build docker-compose.
 
-make up
+make up --->
     Run docker-compose. (with redis and postgres)
 
-make down
+make down --->
     Stop containers. (if you started it with 'make up' command)
 
-make migrate
+make migrate --->
     If you want to use postgres locally (not in container), use this command to create tables.
     But don't forget to create your database and set configs.
 
-make start_redis
+make start_redis --->
     Start redis.
 
-make stop_redis
+make stop_redis --->
     Stop redis container. 
