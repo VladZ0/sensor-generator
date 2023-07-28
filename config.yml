@@ -1,0 +1,52 @@
+---
+
+is_debug: false
+is_production: true
+
+listen:
+  type: port
+  bind_ip: 0.0.0.0
+  port: 8080
+  socket_file: app.sock
+
+app_config:
+  log_level: trace
+
+pg_config:
+  username: vlad
+  database: sensor-generator
+  password: postgres
+  host: db
+  port: 5432
+  ssl_mode: disable
+
+redis_config:
+  host: redis
+  port: 6379
+  Database: 0
+  MaxRetries: 5
+
+cors_config:
+  allowed_methods:
+    - GET
+    - POST
+    - PATCH
+    - PUT
+    - DELETE
+    - OPTIONS
+  allowed_origins:
+    - http://localhost:3000
+    - http://localhost:8000
+  allowed_headers:
+    - Location
+    - Charset
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - content-type
+    - Origin
+  exposed_headers:
+    - Location
+    - Authoriztion
+    - Content-Disposition
+  allow_credentials: true
+  options_passthrough: true

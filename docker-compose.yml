@@ -1,0 +1,49 @@
+version: '3.8'
+
+networks:
+  sensor-generator-network:
+    driver: bridge
+
+services:
+  sensor-generator:
+    build: .
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+      - redis
+    networks:
+      - sensor-generator-network
+
+  db:
+    image: postgres:latest
+    restart: always
+    env_file:
+      - .env.postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    networks:
+      - sensor-generator-network
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - '6379:6379'
+    env_file:
+      - .env.redis
+    volumes:
+      - redis:/data
+    networks:
+      - sensor-generator-network
+
+
+volumes:
+  db:
+    driver: local
+  redis:
+    driver: local
