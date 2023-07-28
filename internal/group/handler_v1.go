@@ -134,6 +134,10 @@ func (h *handler) GetTopNSpiecesInGroup(c *gin.Context) {
 		c.Error(apperror.ErrorWithMessage(apperror.ErrBadRequest, "N is bad."))
 	}
 
+	if N < 0 {
+		c.Error(apperror.ErrorWithMessage(apperror.ErrBadRequest, "N should be >= 0."))
+	}
+
 	filters.TopLimit = N
 
 	spieces, err := h.sensorGroupService.GetSpiecesInGroup(context.Background(),
