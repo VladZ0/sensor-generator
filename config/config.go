@@ -45,7 +45,7 @@ func GetConfig() *Config {
 		instance = &Config{}
 
 		if err := cleanenv.ReadConfig("config.yml", instance); err != nil {
-			helpText := "Messenger project"
+			helpText := "sensor-generator project"
 			help, _ := cleanenv.GetDescription(instance, &helpText)
 			log.Print(help)
 			log.Fatal(err)
