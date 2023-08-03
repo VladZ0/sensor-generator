@@ -10,13 +10,13 @@ import (
 	"path"
 	"path/filepath"
 	"sensors-generator/config"
+	"sensors-generator/internal/generator"
 	"sensors-generator/internal/group"
 	"sensors-generator/internal/middleware"
 	"sensors-generator/internal/mocks"
 	"sensors-generator/internal/sensor"
 	sensordata "sensors-generator/internal/sensorData"
 	"sensors-generator/internal/spiece"
-	"sensors-generator/internal/utils"
 	"sensors-generator/pkg/client/postgresql"
 	"sensors-generator/pkg/client/redis"
 	"sensors-generator/pkg/logging"
@@ -95,26 +95,38 @@ func NewApp(ctx context.Context, cfg *config.Config, logger *logging.Logger) (Ap
 	logger.Info("Create spiece service.")
 	spieceService := spiece.NewService(spieceRepo, logger, cfg)
 
-	if sGroups, _ := sensorGroupService.GetAll(ctx, group.SensorGroupFilters{}); sGroups == nil || len(sGroups) <= 0 {
-		if err := utils.GenerateGroupsSensorsSpieces(mocks.CreateSensorGroups, mocks.CreateSensors,
-			mocks.CreateSpieces, utils.Services{
-				SensorService:      sensorService,
-				SensorGroupService: sensorGroupService,
-				SpieceService:      spieceService,
-			}); err != nil {
-			return App{}, err
-		}
-	}
+	logger.Info("Create Main Entities Generator.")
+	meGen := generator.NewMainEntitiesGenerator(generator.MainEntities{
+		Groups:  mocks.CreateSensorGroups,
+		Sensors: mocks.CreateSensors,
+		Spieces: mocks.CreateSpieces,
+	}, generator.Services{
+		SensorService:      sensorService,
+		SensorGroupService: sensorGroupService,
+		SpieceService:      spieceService,
+	})
 
-	if err := utils.GenerateData(utils.Services{
+	meGen.Generate()
+
+	logger.Info("Create Data Generator.")
+	dataGen := generator.NewDataGenerator(generator.Services{
 		SensorService:      sensorService,
 		SensorGroupService: sensorGroupService,
 		SpieceService:      spieceService,
 		SensorDataService:  sensorDataService,
-	}); err != nil {
-		return App{}, err
+	}, generator.NewRandomGenerator())
+
+	// Start data generator only if main entities created.
+	for {
+		if meGen.IsGenerated() {
+			dataGen.Generate()
+			break
+		}
+
+		time.Sleep(1 * time.Second)
 	}
 
+	// Start app only if data generator started.
 	return App{
 		cfg:    cfg,
 		logger: logger,
